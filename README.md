@@ -2,7 +2,7 @@
 
 A one-page app that estimates spending money from my next Jusfruit paycheck.
 
-- Pay periods are Monday–Sunday two-week blocks; payday is the Friday 5 days after (biweekly, one week behind). Reference payday: Fri Sep 18, 2026.
+- Pay periods are Sunday–Saturday two-week blocks; payday is the Friday 6 days after (biweekly, one week behind). Reference payday: Fri Sep 18, 2026.
 - Spending money = (calendar hours + 5 extra hours) × wage − CPP − EI. Income tax is not subtracted.
 - Wage, extra hours, and CPP/EI rates are editable under "Pay settings" (saved in the browser).
 
