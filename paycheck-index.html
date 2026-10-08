@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jusfruit paycheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5FAF6;
+  --surface: #FFFFFF;
+  --ink: #15261E;
+  --muted: #5B6F64;
+  --line: #D7E5DC;
+  --leaf: #1F5A40;
+  --mango: #F2A23A;
+  --mango-soft: #FCE6C4;
+  --berry: #B23A5E;
+  --cup: #EAF2ED;
+  --focus: #2F7DE1;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1A15; --surface: #16241D; --ink: #EAF3EE; --muted: #9DB3A7;
+    --line: #2A3D33; --leaf: #7FD1A6; --mango: #F5B04F; --mango-soft: #4A3417;
+    --berry: #EE8BA8; --cup: #1D2F26; --focus: #7FB3FF; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1A15; --surface: #16241D; --ink: #EAF3EE; --muted: #9DB3A7;
+  --line: #2A3D33; --leaf: #7FD1A6; --mango: #F5B04F; --mango-soft: #4A3417;
+  --berry: #EE8BA8; --cup: #1D2F26; --focus: #7FB3FF; color-scheme: dark;
+}
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: inherit; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem; line-height: 1.5;
+}
+main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+h1, h2, .display { font-family: "Bricolage Grotesque", "Atkinson Hyperlegible", system-ui, sans-serif; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; }
+.brand { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--leaf); margin: 0; }
+.nav { display: flex; gap: .4rem; }
+.nav button, .ghost {
+  background: transparent; border: 1.5px solid var(--line); border-radius: 999px;
+  padding: .35rem .8rem; cursor: pointer; color: var(--ink);
+}
+.nav button:hover, .ghost:hover { border-color: var(--leaf); }
+.nav button:disabled { opacity: .4; cursor: default; }
+
+.hero h1 {
+  font-weight: 800; font-size: clamp(2.6rem, 11vw, 4.6rem); line-height: .95;
+  letter-spacing: -0.03em; margin: 0 0 .5rem; font-variant-numeric: tabular-nums;
+}
+.hero p { margin: 0; color: var(--muted); font-size: 1.1rem; }
+.hero .when { color: var(--ink); font-weight: 700; }
+
+/* the cups */
+.weeks { margin: 2.25rem 0 1rem; display: grid; gap: 1.25rem; }
+.week-label { font-size: .85rem; color: var(--muted); margin: 0 0 .5rem; }
+.cups { display: grid; grid-template-columns: repeat(7, 1fr); gap: .45rem; }
+.day { display: flex; flex-direction: column; align-items: center; gap: .3rem; min-width: 0; }
+.cup {
+  position: relative; width: 100%; max-width: 3.4rem; aspect-ratio: 3 / 4;
+  background: var(--cup); overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
+}
+.fill {
+  position: absolute; left: 0; right: 0; bottom: 0; background: var(--mango);
+  transform-origin: bottom; animation: pour .7s cubic-bezier(.2,.7,.3,1) both;
+}
+.fill.future {
+  background: repeating-linear-gradient(135deg, var(--mango) 0 5px, var(--mango-soft) 5px 10px);
+}
+@keyframes pour { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .fill { animation: none; } }
+.day.today .cup { outline: 2px solid var(--leaf); outline-offset: 2px; }
+.dname { font-size: .75rem; color: var(--muted); line-height: 1.1; text-align: center; }
+.dhrs { font-size: .8rem; font-weight: 700; font-variant-numeric: tabular-nums; min-height: 1.2em; }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .85rem; color: var(--muted); margin: 0 0 2rem; }
+.swatch { display: inline-block; width: .8rem; height: .8rem; vertical-align: -1px; margin-right: .35rem; border-radius: 2px; background: var(--mango); }
+.swatch.future { background: repeating-linear-gradient(135deg, var(--mango) 0 3px, var(--mango-soft) 3px 6px); }
+
+/* breakdown */
+.breakdown { border-top: 2px solid var(--ink); }
+.row { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.row span:first-child { color: var(--muted); }
+.row.minus span:last-child { color: var(--berry); }
+.row.total { border-bottom: none; font-weight: 700; font-size: 1.15rem; }
+.row.total span:first-child { color: var(--ink); }
+.notes { margin: 1rem 0 0; padding: 0; list-style: none; color: var(--muted); font-size: .92rem; }
+.notes li { margin: .35rem 0; }
+
+.status {
+  margin: 0 0 1.5rem; padding: .85rem 1rem; border-radius: 10px;
+  background: var(--surface); border: 1.5px solid var(--line);
+}
+.status[hidden] { display: none; }
+.status p { margin: 0 0 .5rem; }
+.status p:last-child { margin-bottom: 0; }
+.status.warn { border-color: var(--mango); }
+
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 2rem; align-items: center; }
+.meta { font-size: .85rem; color: var(--muted); }
+
+details { margin-top: 2.25rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+summary { cursor: pointer; font-weight: 700; }
+.settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .9rem 1.25rem; margin-top: 1rem; }
+.settings label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; color: var(--muted); }
+.settings input {
+  padding: .5rem .6rem; border: 1.5px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.hint { font-size: .85rem; color: var(--muted); margin: .9rem 0 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 26rem) {
+  main { padding: 1.1rem .9rem 2.5rem; }
+  .cups { gap: .25rem; }
+  .dname { font-size: .68rem; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <p class="brand">Jusfruit paycheck</p>
+    <nav class="nav" aria-label="Choose payday">
+      <button id="prev" type="button" aria-label="Previous payday">‹ Earlier</button>
+      <button id="next" type="button" aria-label="Next payday">Later ›</button>
+    </nav>
+  </header>
+
+  <div id="status" class="status" role="status" hidden></div>
+
+  <section class="hero" aria-live="polite">
+    <h1 id="amount" class="display">—</h1>
+    <p id="sub">Spending money for <span class="when" id="payday">…</span></p>
+  </section>
+
+  <section class="weeks" id="weeks" aria-label="Shifts in this pay period"></section>
+  <p class="legend">
+    <span><span class="swatch"></span>Worked</span>
+    <span><span class="swatch future"></span>Coming up</span>
+    <span>A full cup is 8 hours</span>
+  </p>
+
+  <section class="breakdown" id="breakdown" aria-label="Pay breakdown"></section>
+  <ul class="notes" id="notes"></ul>
+
+  <div class="actions">
+    <button class="ghost" id="refresh" type="button">Refresh shifts</button>
+    <label class="ghost" id="icsLabel" hidden>
+      Import calendar file (.ics)
+      <input type="file" id="ics" accept=".ics,text/calendar" class="sr">
+    </label>
+    <span class="meta" id="meta"></span>
+  </div>
+
+  <details>
+    <summary>Pay settings</summary>
+    <div class="settings">
+      <label>Hourly wage ($)<input id="s-wage" type="number" step="0.01" min="0" inputmode="decimal"></label>
+      <label>Extra hours per paycheck<input id="s-extra" type="number" step="0.25" min="0" inputmode="decimal"></label>
+      <label>CPP rate (%)<input id="s-cpp" type="number" step="0.01" min="0" inputmode="decimal"></label>
+      <label>CPP yearly exemption ($)<input id="s-exempt" type="number" step="1" min="0" inputmode="decimal"></label>
+      <label>EI rate (%)<input id="s-ei" type="number" step="0.01" min="0" inputmode="decimal"></label>
+    </div>
+    <p class="hint">Paid every second Friday, one week behind. Income tax is not subtracted. <button class="ghost" id="reset" type="button">Reset to defaults</button></p>
+  </details>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- fixed facts about the job ----
+  var SERVER = "Google Calendar";
+  var CAL_NAME = "jusfruit";
+  var DAY = 86400000;
+  var TZ_OFFSET = -6 * 3600000;             // Saskatchewan: UTC-6 all year, no DST
+  var REF_PAYDAY = dayOf(Date.UTC(2026, 8, 18, 12)); // Fri Sep 18, 2026
+  var DEFAULTS = { wage: 17.75, extra: 5, cpp: 5.95, exempt: 3500, ei: 1.63 };
+
+  // ---- Regina-day helpers (day index = days since epoch in Regina time) ----
+  function dayOf(ms) { return Math.floor((ms + TZ_OFFSET) / DAY); }
+  function dayStartMs(d) { return d * DAY - TZ_OFFSET; }
+  function dayDate(d) { return new Date(d * DAY); } // read with UTC getters
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var WDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  function fmtDay(d, withWeekday) {
+    var dt = dayDate(d);
+    return (withWeekday ? WDAYS[dt.getUTCDay()] + ", " : "") + MONTHS[dt.getUTCMonth()] + " " + dt.getUTCDate();
+  }
+  function isoRegina(d) {
+    var dt = dayDate(d);
+    var p = function (n) { return String(n).padStart(2, "0"); };
+    return dt.getUTCFullYear() + "-" + p(dt.getUTCMonth() + 1) + "-" + p(dt.getUTCDate()) + "T00:00:00-06:00";
+  }
+  function money(n) { return "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function hrs(n) { return (Math.round(n * 100) / 100).toString(); }
+  function r2(n) { return Math.round(n * 100) / 100; }
+
+  // ---- settings (per-viewer convenience) ----
+  var settings = Object.assign({}, DEFAULTS);
+  try { var saved = JSON.parse(localStorage.getItem("jf-settings") || "null"); if (saved) Object.assign(settings, saved); } catch (e) {}
+  function saveSettings() { try { localStorage.setItem("jf-settings", JSON.stringify(settings)); } catch (e) {} }
+
+  // ---- pay math (matches the wage skill's calculator) ----
+  function calc(hours) {
+    var gross = r2(hours * settings.wage);
+    var cpp = r2(Math.max(0, gross - settings.exempt / 26) * settings.cpp / 100);
+    var ei = r2(gross * settings.ei / 100);
+    return { gross: gross, cpp: cpp, ei: ei, net: r2(gross - cpp - ei) };
+  }
+
+  // ---- state ----
+  var today = dayOf(Date.now());
+  var firstPayday = REF_PAYDAY + Math.ceil((today - REF_PAYDAY) / 14) * 14; // next payday on/after today
+  var payday = firstPayday;
+  var shiftsByPeriod = {};   // payday -> [{start, end}]
+  var source = null;         // "calendar" | "file" | null
+  var calendarId = null;
+  var mcp = null;
+  var fileShifts = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function period(p) { return { start: p - 18, end: p - 5 }; } // Mon .. Sun inclusive
+
+  // ---- rendering ----
+  function render() {
+    var per = period(payday);
+    var shifts = shiftsForPeriod(payday);
+    $("payday").textContent = fmtDay(payday, true) + (payday === today ? " (today)" : "");
+    $("next").disabled = false;
+
+    // hours per day
+    var byDay = {};
+    var calHours = 0, longShifts = 0, futureDays = [];
+    var now = Date.now();
+    (shifts || []).forEach(function (s) {
+      var h = (s.end - s.start) / 3600000;
+      if (!(h > 0)) return;
+      var d = dayOf(s.start);
+      if (d < per.start || d > per.end) return;
+      if (!byDay[d]) byDay[d] = { h: 0, future: false };
+      byDay[d].h += h;
+      if (s.end > now) { byDay[d].future = true; futureDays.push(d); }
+      calHours += h;
+      if (h > 5) longShifts++;
+    });
+
+    // cups
+    var weeks = $("weeks");
+    weeks.textContent = "";
+    for (var w = 0; w < 2; w++) {
+      var wrap = document.createElement("div");
+      var lab = document.createElement("p");
+      lab.className = "week-label";
+      lab.textContent = "Week of " + fmtDay(per.start + w * 7);
+      var row = document.createElement("div");
+      row.className = "cups";
+      for (var i = 0; i < 7; i++) {
+        var d = per.start + w * 7 + i;
+        var info = byDay[d];
+        var cell = document.createElement("div");
+        cell.className = "day" + (d === today ? " today" : "");
+        var cup = document.createElement("div");
+        cup.className = "cup";
+        if (info) {
+          var f = document.createElement("div");
+          f.className = "fill" + (info.future ? " future" : "");
+          f.style.height = Math.min(100, info.h / 8 * 100) + "%";
+          f.style.animationDelay = (w * 7 + i) * 35 + "ms";
+          cup.appendChild(f);
+        }
+        var nm = document.createElement("div");
+        nm.className = "dname";
+        nm.textContent = WDAYS[dayDate(d).getUTCDay()].charAt(0) + " " + dayDate(d).getUTCDate();
+        var hr = document.createElement("div");
+        hr.className = "dhrs";
+        hr.textContent = info ? hrs(info.h) + "h" : "";
+        cell.setAttribute("aria-label", fmtDay(d, true) + ": " + (info ? hrs(info.h) + " hours" + (info.future ? ", coming up" : "") : "no shift"));
+        cup.setAttribute("aria-hidden", "true");
+        cell.appendChild(cup); cell.appendChild(nm); cell.appendChild(hr);
+        row.appendChild(cell);
+      }
+      wrap.appendChild(lab); wrap.appendChild(row);
+      weeks.appendChild(wrap);
+    }
+
+    // numbers
+    var bd = $("breakdown");
+    var notes = $("notes");
+    bd.textContent = ""; notes.textContent = "";
+    if (shifts === undefined) {
+      $("amount").textContent = "—";
+      return;
+    }
+    var total = calHours + settings.extra;
+    var c = calc(total);
+    $("amount").textContent = money(c.net);
+
+    var rows = [
+      ["Pay period", fmtDay(per.start) + " – " + fmtDay(per.end)],
+      ["Calendar hours", hrs(calHours)],
+      ["Extra hours", hrs(settings.extra)],
+      ["Total hours", hrs(total)],
+      ["Gross pay", money(c.gross)],
+      ["CPP", "−" + money(c.cpp), "minus"],
+      ["EI", "−" + money(c.ei), "minus"],
+      ["Spending money", money(c.net), "total"]
+    ];
+    rows.forEach(function (r) {
+      var el = document.createElement("div");
+      el.className = "row" + (r[2] ? " " + r[2] : "");
+      var a = document.createElement("span"); a.textContent = r[0];
+      var b = document.createElement("span"); b.textContent = r[1];
+      el.appendChild(a); el.appendChild(b); bd.appendChild(el);
+    });
+
+    var noteList = [];
+    if (futureDays.length) {
+      var uniq = futureDays.filter(function (d, i, a) { return a.indexOf(d) === i; }).sort(function (a, b) { return a - b; });
+      noteList.push("Not worked yet: " + uniq.map(function (d) { return fmtDay(d); }).join(", ") + ". These hours could still change.");
+    }
+    if (longShifts) {
+      var lower = calc(total - 0.5 * longShifts).net;
+      noteList.push("If your " + longShifts + " shift" + (longShifts > 1 ? "s" : "") + " over 5 hours include an unpaid 30-minute break, it'd be about " + money(lower) + ".");
+    }
+    if (!calHours) noteList.push("No Jusfruit shifts found in this pay period.");
+    noteList.push("Your pay stub may be lower if payroll withholds income tax or other deductions.");
+    noteList.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; notes.appendChild(li); });
+  }
+
+  function shiftsForPeriod(p) {
+    if (source === "file") {
+      if (!fileShifts) return undefined;
+      var per = period(p);
+      return fileShifts.filter(function (s) { var d = dayOf(s.start); return d >= per.start && d <= per.end; });
+    }
+    return shiftsByPeriod[p];
+  }
+
+  function showStatus(kind, lines, buttons) {
+    var el = $("status");
+    el.className = "status" + (kind === "warn" ? " warn" : "");
+    el.textContent = "";
+    lines.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; el.appendChild(p); });
+    if (buttons && buttons.length) {
+      var p = document.createElement("p");
+      buttons.forEach(function (b) {
+        var btn = document.createElement("button");
+        btn.type = "button"; btn.className = "ghost"; btn.textContent = b.label;
+        btn.addEventListener("click", b.onClick);
+        p.appendChild(btn);
+      });
+      el.appendChild(p);
+    }
+    el.hidden = false;
+  }
+  function clearStatus() { $("status").hidden = true; }
+
+  // ---- calendar loading ----
+  function load(force) {
+    if (source === "file") { render(); return; }
+    if (!mcp) { render(); return; }
+    if (!force && shiftsByPeriod[payday]) { render(); return; }
+    var p = payday;
+    $("meta").textContent = "Loading shifts…";
+    render();
+    findCalendar(force).then(function (id) {
+      return fetchEvents(id, p, force);
+    }).then(function (res) {
+      shiftsByPeriod[p] = res.shifts;
+      clearStatus();
+      var when = res.storedAt ? new Date(res.storedAt) : new Date();
+      $("meta").textContent = "Updated " + when.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      if (p === payday) render();
+    }).catch(function (err) {
+      $("meta").textContent = "";
+      handleError(err);
+      if (p === payday) render();
+    });
+  }
+
+  function findCalendar(force) {
+    if (calendarId && !force) return Promise.resolve(calendarId);
+    return mcp.callTool(SERVER, "list_calendars", {}, { cache: { staleTime: 300000 } }).then(function (r) {
+      var cals = (r.payload && r.payload.calendars) || [];
+      var hit = cals.filter(function (c) { return String(c.summary || "").trim().toLowerCase() === CAL_NAME; })[0];
+      if (!hit) { var e = new Error("no-cal"); e.code = "no_calendar"; throw e; }
+      calendarId = hit.id;
+      return calendarId;
+    });
+  }
+
+  function fetchEvents(id, p, force) {
+    var per = period(p);
+    var out = [], storedAt = null;
+    function page(token) {
+      var input = { calendarId: id, startTime: isoRegina(per.start), endTime: isoRegina(per.end + 1), orderBy: "startTime", pageSize: 250 };
+      if (token) input.pageToken = token;
+      return mcp.callTool(SERVER, "list_events", input, { cache: force ? { refresh: true, staleTime: 60000 } : { staleTime: 60000 } }).then(function (r) {
+        if (r.cache && r.cache.storedAt) storedAt = r.cache.storedAt;
+        var pl = r.payload || {};
+        (pl.events || []).forEach(function (ev) {
+          if (ev.status === "cancelled") return;
+          if (!ev.start || !ev.start.dateTime || !ev.end || !ev.end.dateTime) return; // skip all-day events
+          var s = Date.parse(ev.start.dateTime), e = Date.parse(ev.end.dateTime);
+          if (isFinite(s) && isFinite(e)) out.push({ start: s, end: e });
+        });
+        return pl.nextPageToken ? page(pl.nextPageToken) : { shifts: out, storedAt: storedAt };
+      });
+    }
+    return page(null);
+  }
+
+  function handleError(err) {
+    var code = err && err.code;
+    var retry = [{ label: "Try again", onClick: function () { load(true); } }];
+    if (code === "no_calendar") {
+      showStatus("warn", ["No calendar named “Jusfruit” in your Google Calendar. Create one, or rename the calendar your shifts are in, then try again."], retry);
+    } else if (code === "needs_reauth") {
+      showStatus("warn", ["Google Calendar needs reconnecting. Reconnect it in claude.ai Settings → Connectors, then try again."], retry);
+    } else if (code === "server_not_connected" || code === "selection_required" || code === "server_not_found") {
+      showStatus("warn", ["Google Calendar isn't connected. Add it in claude.ai Settings → Connectors, then try again."], retry);
+      offerFile();
+    } else if (code === "not_in_manifest" || code === "consent_required") {
+      showStatus("warn", ["This page isn't allowed to read your calendar. Allow Google Calendar for this page to see your shifts."], retry);
+      offerFile();
+    } else if (code === "blocked_by_policy") {
+      showStatus("warn", ["Your organization blocks calendar access for this page."]);
+      offerFile();
+    } else if (code === "server_unavailable" || code === "rate_limited") {
+      showStatus("warn", ["Google Calendar didn't answer. Wait a moment and try again."], retry);
+    } else if (code === "tool_error") {
+      showStatus("warn", ["Google Calendar reported a problem: " + (err.message || "unknown error")], retry);
+    } else if (code === "not_granted" || code === "capability_disabled" || code === "capability_removed") {
+      mcp = null; offerFile(true);
+    } else {
+      showStatus("warn", ["Couldn't load shifts" + (err && err.message ? ": " + err.message : ".")], retry);
+    }
+  }
+
+  // ---- .ics fallback (for the self-hosted copy) ----
+  function offerFile(asPrimary) {
+    $("icsLabel").hidden = false;
+    $("refresh").hidden = !mcp;
+    if (asPrimary) {
+      showStatus("info", [
+        "Live calendar sync only works when this page is opened on claude.ai.",
+        "Here, import your Jusfruit calendar instead: in Google Calendar on a computer, open Settings → your Jusfruit calendar → Export calendar, unzip it, and choose the .ics file below."
+      ]);
+    }
+  }
+
+  function parseICS(text) {
+    var lines = text.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "").split(/\r?\n/);
+    var shifts = [], cur = null, recurring = 0;
+    lines.forEach(function (ln) {
+      if (ln === "BEGIN:VEVENT") cur = {};
+      else if (ln === "END:VEVENT") {
+        if (cur && cur.start != null && cur.end != null && cur.status !== "CANCELLED") {
+          if (cur.rrule) recurring++;
+          shifts.push({ start: cur.start, end: cur.end });
+        }
+        cur = null;
+      } else if (cur) {
+        var i = ln.indexOf(":"); if (i < 0) return;
+        var key = ln.slice(0, i), val = ln.slice(i + 1);
+        var name = key.split(";")[0];
+        if (name === "DTSTART") cur.start = icsTime(key, val);
+        else if (name === "DTEND") cur.end = icsTime(key, val);
+        else if (name === "RRULE") cur.rrule = true;
+        else if (name === "STATUS") cur.status = val;
+      }
+    });
+    return { shifts: shifts, recurring: recurring };
+  }
+  function icsTime(key, v) {
+    var m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/.exec(v);
+    if (!m) return null; // all-day events are skipped
+    var utc = Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+    if (m[7] === "Z") return utc;
+    var tz = /TZID=([^;:]+)/.exec(key);
+    if (tz && !/Regina|Saskatchewan|Swift_Current/i.test(tz[1])) {
+      // other zones: best effort using the browser's offset for that wall time is not possible; assume Regina
+    }
+    return utc - TZ_OFFSET; // Regina wall time -> UTC
+  }
+
+  $("ics").addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    file.text().then(function (txt) {
+      var res = parseICS(txt);
+      fileShifts = res.shifts; source = "file";
+      clearStatus();
+      $("meta").textContent = "Loaded " + res.shifts.length + " events from " + file.name;
+      if (res.recurring) showStatus("warn", [res.recurring + " repeating event(s) were counted only once. Add repeating shifts as separate events for accurate totals."]);
+      render();
+    }).catch(function () {
+      showStatus("warn", ["That file couldn't be read. Choose the .ics file from your Google Calendar export."]);
+    });
+  });
+
+  // ---- controls ----
+  $("prev").addEventListener("click", function () { payday -= 14; load(false); });
+  $("next").addEventListener("click", function () { payday += 14; load(false); });
+  $("refresh").addEventListener("click", function () { load(true); });
+
+  var fields = { wage: "s-wage", extra: "s-extra", cpp: "s-cpp", exempt: "s-exempt", ei: "s-ei" };
+  function fillSettings() { Object.keys(fields).forEach(function (k) { $(fields[k]).value = settings[k]; }); }
+  Object.keys(fields).forEach(function (k) {
+    $(fields[k]).addEventListener("input", function (e) {
+      var v = parseFloat(e.target.value);
+      if (isFinite(v) && v >= 0) { settings[k] = v; saveSettings(); render(); }
+    });
+  });
+  $("reset").addEventListener("click", function () { settings = Object.assign({}, DEFAULTS); saveSettings(); fillSettings(); render(); });
+  fillSettings();
+
+  // ---- start ----
+  render();
+  var hasClaude = window.claude && typeof window.claude.use === "function";
+  if (!hasClaude) {
+    offerFile(true);
+  } else {
+    $("meta").textContent = "Connecting…";
+    window.claude.use("mcp").then(function (ns) {
+      if (!ns) { $("meta").textContent = ""; offerFile(true); return; }
+      mcp = ns;
+      load(false);
+    }).catch(function () { $("meta").textContent = ""; offerFile(true); });
+  }
+})();
+</script>
+</body>
+</html>
